@@ -18,7 +18,11 @@ initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 
 <body>
     <div id="app">
-        <product :premium="premium" />
+        <div class="cart">
+            <p>Cart({{ cart.length }})</p>
+        </div>
+        <product :premium="premium" @add-to-cart="updateCart" @remove-from-cart="removeProduct"
+            :can-remove-from-card="canRemoveFromCard" @update-current-product-id="updateCurrentProductId"></product>
     </div>
 </body>
 
