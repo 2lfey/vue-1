@@ -24,6 +24,11 @@ initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
             </div>
             <div class="product-info">
                 <h1>{{ product }}</h1>
+
+                <div class="cart">
+                    <p>Cart({{ cart }})</p>
+                </div>
+
                 <p v-if="inStock">In stock</p>
                 <p v-else>Out of Stock</p>
 
@@ -32,12 +37,13 @@ initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
                 </ul>
 
                 <div v-for="variant in variants" :key="variant.variantId">
-                    <p>{{ variant.variantColor }}</p>
+                    <p @mouseover="updateProduct(variant.variantImage)">
+                        {{ variant.variantColor }}
+                    </p>
                 </div>
 
-                <ul>
-                    <li v-for="size in sizes">{{ size }}</li>
-                </ul>
+                <button v-on:click="removeFromCart">Remove from cart</button>
+                <button v-on:click="addToCart">Add to cart</button>
             </div>
         </div>
     </div>
