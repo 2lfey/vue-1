@@ -155,7 +155,7 @@ Vue.component("review-item", {
       })
 
       this.initialCopy = this.copy
-      isEdit = false
+      this.isEdit = false
     },
   }
 })
