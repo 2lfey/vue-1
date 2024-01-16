@@ -19,7 +19,7 @@ initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 <body>
     <div id="app">
         <div class="cart">
-            <p>Cart({{ cart.length }})</p>
+            <p>Cart({{ cart.length }}) price: {{ cartPrice }}</p>
         </div>
         <product :premium="premium" @add-to-cart="updateCart"></product>
     </div>

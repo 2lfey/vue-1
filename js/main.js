@@ -101,6 +101,9 @@ Vue.component("product", {
 
        <div class="product-info">
            <h1>{{ title }}</h1>
+           
+           <p>Price: {{ price }}<p/>
+
            <p v-if="inStock">In stock</p>
            <p v-else>Out of Stock</p>
 
@@ -139,12 +142,14 @@ Vue.component("product", {
           variantId: 2234,
           variantColor: "green",
           variantImage: "./assets/vmSocks-green-onWhite.jpg",
+          price: 14.99,
           variantQuantity: 10,
         },
         {
           variantId: 2235,
           variantColor: "blue",
           variantImage: "./assets/vmSocks-blue-onWhite.jpg",
+          price: 9.99,
           variantQuantity: 0,
         },
       ],
@@ -153,7 +158,7 @@ Vue.component("product", {
   },
   methods: {
     addToCart() {
-      this.$emit("add-to-cart", this.variants[this.selectedVariant].variantId);
+      this.$emit("add-to-cart", this.variants[this.selectedVariant]);
     },
     updateProduct(index) {
       this.selectedVariant = index;
@@ -172,6 +177,9 @@ Vue.component("product", {
     },
     inStock() {
       return this.variants[this.selectedVariant].variantQuantity;
+    },
+    price() {
+      return this.variants[this.selectedVariant].price;
     },
     shipping() {
       if (this.premium) {
@@ -243,10 +251,12 @@ let app = new Vue({
   data: {
     premium: true,
     cart: [],
+    cartPrice: 0,
   },
   methods: {
-    updateCart(id) {
-      this.cart.push(id);
+    updateCart(variant) {
+      this.cart.push(variant.id);
+      this.cartPrice += variant.price;
     },
   },
 });
