@@ -64,7 +64,7 @@ Vue.component("product-review", {
   },
   methods: {
     onSubmit() {
-      if (this.name && this.review && this.rating) {
+      if (this.isRecommend != null && this.name && this.review && this.rating) {
         let productReview = {
           isRecommend: this.isRecommend,
           name: this.name,
@@ -85,6 +85,80 @@ Vue.component("product-review", {
     },
   },
 });
+
+Vue.component("review-item", {
+  props: {
+    initial: {
+      type: Object,
+      required: true,
+    },
+    id: {
+      type: Number,
+      required: true,
+    }
+  },
+  beforeMount() {
+    this.initialCopy = {...this.initial}
+    this.copy = {...this.initial}
+  },
+  data: () => ({
+    isEdit: false,
+    initialCopy: {},
+    copy: {}
+  }),
+  template: `
+  <li>
+
+    <div @click="isEdit = true" v-show="!isEdit">
+      <p>{{ initialCopy.name }}</p>
+      <p>Rating: {{ initialCopy.rating }}</p>
+      <p>{{ initialCopy.review }}</p>
+    </div>
+
+    <form v-show="isEdit" @submit.prevent="onSubmit">
+
+  <p>
+    <label for="name">Name:</label>
+    <input id="name" v-model="copy.name" placeholder="name">
+  </p>
+
+  <p>
+    <label for="review">Review:</label>
+    <textarea id="review" v-model="copy.review"></textarea>
+  </p>
+
+  <p>
+    <label for="rating">Rating:</label>
+    <select id="rating" v-model.number="copy.rating">
+      <option>5</option>
+      <option>4</option>
+      <option>3</option>
+      <option>2</option>
+      <option>1</option>
+    </select>
+  </p>
+
+  <p>
+    <button @click="isEdit = false">Cancel</button>
+
+    <input type="submit" value="Submit"> 
+  </p>
+
+  </form>
+  </li>
+  `,
+  methods: {
+    onSubmit() {
+      eventBus.$emit("review-updated", {
+        id: this.id,
+        review: this.copy
+      })
+
+      this.initialCopy = this.copy
+      isEdit = false
+    },
+  }
+})
 
 Vue.component("product", {
   props: {
@@ -122,13 +196,18 @@ Vue.component("product", {
            >
                Add to cart
            </button>    
-       </div>           
-       
-       <product-tabs :reviews="reviews" :shipping="shipping"></product-tabs>
+      </div>
+
+      <product-tabs :reviews="reviews" :shipping="shipping"></product-tabs>
+    </div>
  `,
   mounted() {
     eventBus.$on("review-submitted", (productReview) => {
       this.reviews.push(productReview);
+    });
+
+    eventBus.$on("review-updated", ({id, review}) => {
+      this.reviews[id] = review
     });
   },
   data() {
@@ -214,11 +293,7 @@ Vue.component("product-tabs", {
        <div v-show="selectedTab === 'Reviews'">
          <p v-if="!reviews.length">There are no reviews yet.</p>
          <ul>
-           <li v-for="review in reviews">
-           <p>{{ review.name }}</p>
-           <p>Rating: {{ review.rating }}</p>
-           <p>{{ review.review }}</p>
-           </li>
+           <review-item v-for="(review, index) in reviews" :key="index" :id="index" :initial="review"/>
          </ul>
        </div>
 
