@@ -4,10 +4,6 @@ Vue.component("product", {
       type: Boolean,
       required: true,
     },
-    canRemoveFromCard: {
-      type: Boolean,
-      required: true,
-    },
   },
   template: `
    <div class="product">
@@ -24,25 +20,17 @@ Vue.component("product", {
            </ul>
           <p>Shipping: {{ shipping }}</p>
            <div
-                class="color-box"
-                v-for="(variant, index) in variants"
-                :key="variant.variantId"
-                :style="{ backgroundColor:variant.variantColor }"
-                @mouseover="updateProduct(index)"
+                   class="color-box"
+                   v-for="(variant, index) in variants"
+                   :key="variant.variantId"
+                   :style="{ backgroundColor:variant.variantColor }"
+                   @mouseover="updateProduct(index)"
            ></div>
-
+          
            <button
-                v-on:click="removeFromCart"
-                :disabled="!canRemoveFromCard"
-                :class="{ disabledButton: !canRemoveFromCard }"
-           >
-               Remove from cart
-           </button>
-
-           <button
-                v-on:click="addToCart"
-                :disabled="!inStock"
-                :class="{ disabledButton: !inStock }"
+                   v-on:click="addToCart"
+                   :disabled="!inStock"
+                   :class="{ disabledButton: !inStock }"
            >
                Add to cart
            </button>
@@ -77,14 +65,7 @@ Vue.component("product", {
     addToCart() {
       this.$emit("add-to-cart", this.variants[this.selectedVariant].variantId);
     },
-    removeFromCart() {
-      this.$emit(
-        "remove-from-cart",
-        this.variants[this.selectedVariant].variantId
-      );
-    },
     updateProduct(index) {
-      this.$emit("update-current-product-id", this.variants[index].variantId);
       this.selectedVariant = index;
       console.log(index);
     },
@@ -109,41 +90,66 @@ Vue.component("product", {
   },
 });
 
+Vue.component("product-review", {
+  template: `
+   <form class="review-form" @submit.prevent="onSubmit">
+ <p>
+   <label for="name">Name:</label>
+   <input id="name" v-model="name" placeholder="name">
+ </p>
+
+ <p>
+   <label for="review">Review:</label>
+   <textarea id="review" v-model="review"></textarea>
+ </p>
+
+ <p>
+   <label for="rating">Rating:</label>
+   <select id="rating" v-model.number="rating">
+     <option>5</option>
+     <option>4</option>
+     <option>3</option>
+     <option>2</option>
+     <option>1</option>
+   </select>
+ </p>
+
+ <p>
+   <input type="submit" value="Submit"> 
+ </p>
+
+</form>
+
+ `,
+  data: () => ({
+    name: null,
+    review: null,
+    rating: null,
+  }),
+  
+  methods: {
+    onSubmit() {
+      let productReview = {
+        name: this.name,
+        review: this.review,
+        rating: this.rating,
+      };
+      this.name = null;
+      this.review = null;
+      this.rating = null;
+    },
+  },
+});
+
 let app = new Vue({
   el: "#app",
   data: {
     premium: true,
     cart: [],
-    // canRemoveFromCard: false,
-    _updateCurrentProductId: -1,
   },
   methods: {
     updateCart(id) {
       this.cart.push(id);
-    },
-    updateCurrentProductId(id) {
-      this._updateCurrentProductId = id;
-      console.log(id);
-      this.canRemoveFromCard =
-        this.cart.length > 0 &&
-        this.cart.filter((i) => i.variantId === id).length > 0;
-      console.log(this.canRemoveFromCard);
-    },
-
-    removeProduct(id) {
-      let index = this.cart.indexOf(id);
-      if (index > -1) {
-        this.cart.splice(index, 1);
-      }
-    },
-  },
-  computed: {
-    canRemoveFromCard() {
-      return (
-        this.cart.length > 0 &&
-        this.cart.filter((i) => i.variantId === this._updateCurrentProductId)
-          .length > 0
-      );
     },
   },
 });
